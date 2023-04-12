@@ -1,0 +1,44 @@
+package service
+
+import (
+	"errors"
+	"unit-test/models"
+	"unit-test/repository"
+)
+
+type Services interface {
+	GetOneProduct(id uint) (*models.Product, error)
+	GetAllProducts(role string) (*[]models.Product, error)
+}
+
+type ProductService struct {
+	Repository repository.ProductRepository
+}
+
+func (service ProductService) GetOneProduct(id uint) (*models.Product, error) {
+	product, err := service.Repository.FindById(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if product == nil {
+		return product, errors.New("product not found")
+	}
+
+	return product, err
+}
+
+func (service ProductService) GetAllProducts(role string) (*[]models.Product, error) {
+	products, err := service.Repository.FindAll(role)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if products == nil {
+		return products, errors.New("product not found")
+	}
+
+	return products, err
+}
