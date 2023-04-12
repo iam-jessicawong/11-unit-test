@@ -21,13 +21,13 @@ func (repository *ProductRepositoryMock) FindById(id uint) (*models.Product, err
 	return &product, nil
 }
 
-func (repository *ProductRepositoryMock) FindAll(role string, userId uint) ([]*models.Product, error) {
+func (repository *ProductRepositoryMock) FindAll(role string, userId uint) ([]models.Product, error) {
 	arguments := repository.Mock.Called(role, userId)
 
 	if arguments.Get(0) == nil {
 		return nil, arguments.Error(0)
 	}
 
-	products := arguments.Get(0).([]*models.Product)
+	products := arguments.Get(0).([]models.Product)
 	return products, nil
 }

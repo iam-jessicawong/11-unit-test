@@ -8,7 +8,7 @@ import (
 
 type Services interface {
 	GetOneProduct(id uint) (*models.Product, error)
-	GetAllProducts(role string) (*[]models.Product, error)
+	GetAllProducts(role string) ([]models.Product, error)
 }
 
 type ProductService struct {
@@ -29,7 +29,7 @@ func (service ProductService) GetOneProduct(id uint) (*models.Product, error) {
 	return product, err
 }
 
-func (service ProductService) GetAllProducts(role string, userId uint) ([]*models.Product, error) {
+func (service ProductService) GetAllProducts(role string, userId uint) ([]models.Product, error) {
 	products, err := service.Repository.FindAll(role, userId)
 
 	if err != nil {

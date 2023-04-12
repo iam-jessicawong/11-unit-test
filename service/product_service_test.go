@@ -44,7 +44,7 @@ func TestProductServiceGetOneProduct_NotFound(t *testing.T) {
 }
 
 func TestProductServiceGetAllProduct(t *testing.T) {
-	products := []*models.Product{
+	products := []models.Product{
 		{
 			GormModel:   models.GormModel{ID: 1},
 			Title:       "bantal",
