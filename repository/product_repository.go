@@ -7,7 +7,7 @@ import (
 
 type ProductRepository interface {
 	FindById(id uint) (*models.Product, error)
-	FindAll(role string) (*[]models.Product, error)
+	FindAll(role string, userId uint) ([]*models.Product, error)
 }
 
 func FindById(id uint) (*models.Product, error) {
@@ -16,4 +16,18 @@ func FindById(id uint) (*models.Product, error) {
 	err := db.Debug().Preload("User").First(&product, "id = ?", id).Error
 
 	return &product, err
+}
+
+func FindAll(role string, userId uint) ([]*models.Product, error) {
+	db := database.GetDB()
+	products := []*models.Product{}
+	var err error
+
+	if role == "admin" {
+		err = db.Debug().Preload("User").Find(&products).Error
+	} else {
+		err = db.Debug().Find(&products, "user_id = ?", userId).Error
+	}
+
+	return products, err
 }

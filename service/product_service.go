@@ -29,8 +29,8 @@ func (service ProductService) GetOneProduct(id uint) (*models.Product, error) {
 	return product, err
 }
 
-func (service ProductService) GetAllProducts(role string) (*[]models.Product, error) {
-	products, err := service.Repository.FindAll(role)
+func (service ProductService) GetAllProducts(role string, userId uint) ([]*models.Product, error) {
+	products, err := service.Repository.FindAll(role, userId)
 
 	if err != nil {
 		return nil, err
