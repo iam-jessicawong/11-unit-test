@@ -10,7 +10,9 @@ type ProductRepository interface {
 	FindAll(role string, userId uint) ([]models.Product, error)
 }
 
-func FindById(id uint) (*models.Product, error) {
+type ProductRepositoryStruct struct{}
+
+func (*ProductRepositoryStruct) FindById(id uint) (*models.Product, error) {
 	db := database.GetDB()
 	product := models.Product{}
 	err := db.Debug().Preload("User").First(&product, "id = ?", id).Error
@@ -18,7 +20,7 @@ func FindById(id uint) (*models.Product, error) {
 	return &product, err
 }
 
-func FindAll(role string, userId uint) ([]models.Product, error) {
+func (*ProductRepositoryStruct) FindAll(role string, userId uint) ([]models.Product, error) {
 	db := database.GetDB()
 	products := []models.Product{}
 	var err error

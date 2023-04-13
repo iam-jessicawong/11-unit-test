@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 	"unit-test/database"
@@ -13,24 +14,16 @@ import (
 )
 
 type ProductController struct {
-	Service service.Services
+	Service        service.Services
+	ProductService service.ProductService
 }
 
-func GetProducts(c *gin.Context) {
-	db := database.GetDB()
+func (pc *ProductController) GetProducts(c *gin.Context) {
 	userData := c.MustGet("userData").(jwt.MapClaims)
-	Products := []models.Product{}
 	userId := uint(userData["id"].(float64))
-	var err error
-
-	if userData["role"] == "admin" {
-		err = db.Debug().Preload("User").Find(&Products).Error
-		for _, product := range Products {
-			product.User.Password = ""
-		}
-	} else {
-		err = db.Debug().Find(&Products, "user_id = ?", userId).Error
-	}
+	role := string(userData["role"].(string))
+	log.Println(userId, role)
+	product, err := pc.ProductService.GetAllProducts(role, userId)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -40,22 +33,29 @@ func GetProducts(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, Products)
+	if role == "admin" {
+		for _, product := range product {
+			product.User.Password = ""
+		}
+
+	}
+
+	c.JSON(http.StatusOK, product)
 }
 
 func (pc *ProductController) GetProduct(c *gin.Context) {
-	productId, _ := strconv.Atoi(c.Param("id")) //tinggalin ini di controller
-	Product, err := pc.Service.GetOneProduct(uint(productId))
+	productId, _ := strconv.Atoi(c.Param("id"))
+	product, err := pc.ProductService.GetOneProduct(uint(productId))
 
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Error getting products data",
 			"err":     err.Error(),
 		})
 		return
 	}
-	Product.User.Password = ""
-	c.JSON(http.StatusOK, Product)
+	product.User.Password = ""
+	c.JSON(http.StatusOK, &product)
 }
 
 func CreateProduct(c *gin.Context) {

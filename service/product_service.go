@@ -8,15 +8,16 @@ import (
 
 type Services interface {
 	GetOneProduct(id uint) (*models.Product, error)
-	GetAllProducts(role string) ([]models.Product, error)
+	GetAllProducts(role string, userId uint) ([]models.Product, error)
 }
 
 type ProductService struct {
 	Repository repository.ProductRepository
+	PRStruct   repository.ProductRepositoryStruct
 }
 
-func (service ProductService) GetOneProduct(id uint) (*models.Product, error) {
-	product, err := service.Repository.FindById(id)
+func (service *ProductService) GetOneProduct(id uint) (*models.Product, error) {
+	product, err := service.PRStruct.FindById(id)
 
 	if err != nil {
 		return nil, err
@@ -29,8 +30,8 @@ func (service ProductService) GetOneProduct(id uint) (*models.Product, error) {
 	return product, err
 }
 
-func (service ProductService) GetAllProducts(role string, userId uint) ([]models.Product, error) {
-	products, err := service.Repository.FindAll(role, userId)
+func (service *ProductService) GetAllProducts(role string, userId uint) ([]models.Product, error) {
+	products, err := service.PRStruct.FindAll(role, userId)
 
 	if err != nil {
 		return nil, err
