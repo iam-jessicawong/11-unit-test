@@ -7,23 +7,22 @@ import (
 	"unit-test/database"
 	"unit-test/helpers"
 	"unit-test/models"
+	"unit-test/repository"
 	"unit-test/service"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
-type ProductController struct {
-	Service        service.Services
-	ProductService service.ProductService
-}
+var productRepository = &repository.ProductRepositoryStruct{}
+var productService = service.ProductService{Repository: productRepository}
 
-func (pc *ProductController) GetProducts(c *gin.Context) {
+func GetProducts(c *gin.Context) {
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	userId := uint(userData["id"].(float64))
 	role := string(userData["role"].(string))
 	log.Println(userId, role)
-	product, err := pc.ProductService.GetAllProducts(role, userId)
+	product, err := productService.GetAllProducts(role, userId)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -43,9 +42,9 @@ func (pc *ProductController) GetProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, product)
 }
 
-func (pc *ProductController) GetProduct(c *gin.Context) {
+func GetProduct(c *gin.Context) {
 	productId, _ := strconv.Atoi(c.Param("id"))
-	product, err := pc.ProductService.GetOneProduct(uint(productId))
+	product, err := productService.GetOneProduct(uint(productId))
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
